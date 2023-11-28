@@ -1,10 +1,7 @@
 package entities;
 
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 
 public class Grafo {
     private Map<String, Nodo> nodos = new HashMap<>();
@@ -14,38 +11,46 @@ public class Grafo {
     }
 
     public void adicionarAresta(String origem, String destino, int valorAresta) {
-        Nodo nodoOrigem = nodos.get(origem);
-        Nodo nodoDestino = nodos.get(destino);
-
-        if (nodoOrigem != null && nodoDestino != null) {
-            nodoOrigem.adicionarVizinho(destino);
-            nodoOrigem.adicionarAresta(destino, valorAresta);
+        if (Objects.nonNull(nodos.get(origem)) && Objects.nonNull(nodos.get(destino))) {
+            nodos.get(origem).adicionarVizinho(destino);
+            nodos.get(origem).adicionarAresta(destino, valorAresta);
         }
     }
 
     public void atribuirValorAresta(String nodoNome, BigInteger valor) {
-        Nodo nodo = nodos.get(nodoNome);
-        if (nodo != null) {
-            nodo.atribuirValor(valor);
+        if (nodos.get(nodoNome) != null) {
+            nodos.get(nodoNome).atribuirValor(valor);
         }
     }
 
     public BigInteger obterValorNodo(String nodoNome) {
-        Nodo nodo = nodos.get(nodoNome);
-        return (nodo != null) ? nodo.obterValor() : BigInteger.ZERO;
+        BigInteger valor;
+        if (nodos.get(nodoNome) != null) {
+            valor = nodos.get(nodoNome).obterValor();
+        } else {
+            valor = BigInteger.ZERO;
+        }
+        return valor;
     }
 
     public int obterValorAresta(String origem, String destino) {
         Nodo nodoOrigem = nodos.get(origem);
-        return (nodoOrigem != null) ? nodoOrigem.obterValorAresta(destino) : -1;
+        int valorAresta;
+        if (nodoOrigem != null) {
+            valorAresta = nodoOrigem.obterValorAresta(destino);
+        } else {
+            valorAresta = -1;
+        }
+        return valorAresta;
+
     }
 
     public BigInteger swim(String nodoInicial) {
-        long startTime = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
 
         Map<String, Integer> checkins = new HashMap<>();
-        for (String nodoNome : nodos.keySet()) {
-            checkins.put(nodoNome, 0);
+        for (String node : nodos.keySet()) {
+            checkins.put(node, 0);
         }
 
         for (Nodo nodo : nodos.values()) {
@@ -60,9 +65,8 @@ public class Grafo {
         while (!fila.isEmpty()) {
             String nodoAtual = fila.poll();
 
-            Nodo nodo = nodos.get(nodoAtual);
-            if (nodo != null) {
-                for (String vizinho : nodo.obterVizinhos()) {
+            if (nodos.get(nodoAtual) != null) {
+                for (String vizinho : nodos.get(nodoAtual).obterVizinhos()) {
                     BigInteger valorAtual = obterValorNodo(nodoAtual);
                     int valorAresta = obterValorAresta(nodoAtual, vizinho);
                     BigInteger valorVizinho = obterValorNodo(vizinho);
@@ -80,9 +84,9 @@ public class Grafo {
             }
         }
 
-        long endTime = System.currentTimeMillis();
-        long duration = (endTime - startTime);
-        System.out.println("Executado em: " + duration + " ms");
+        long end = System.currentTimeMillis();
+        long tempoTotal = (end - start);
+        System.out.println("Executado em: " + tempoTotal + " ms");
 
         return obterValorNodo("ouro");
     }
