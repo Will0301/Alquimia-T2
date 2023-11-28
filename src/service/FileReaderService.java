@@ -6,16 +6,22 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
 public class FileReaderService {
 
     public static void carregarArquivo(Grafo grafo, File arquivo) {
-        try (BufferedReader br = new BufferedReader(new FileReader(arquivo.getPath()))) {
-            String linha;
-            while ((linha = br.readLine()) != null) {
+        try {
+            List<String> linhas = Files.readAllLines(Path.of(arquivo.getPath()));
+            for (String linha : linhas) {
                 processarLinha(grafo, linha);
             }
         } catch (IOException e) {
-            System.out.println("Erro ao carregar o arquivo");
+            System.out.println("Erro! Arquivo não encontrado \n" +
+                    "Mensagem de erro: " + e.getMessage() + "\n" +
+                    "Causa do erro: " + e.getCause());
         }
     }
 
